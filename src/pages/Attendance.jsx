@@ -117,11 +117,14 @@ const Attendance = () => {
   };
 
   const handleStatusChange = (empId, status) => {
-    if (!isEditingUnlocked) {
+    const isAlreadyMarked = currentRecords[empId] !== undefined;
+    
+    if (isAlreadyMarked && !isEditingUnlocked) {
       setPendingAction({ empId, status });
       setShowPasswordModal(true);
       return;
     }
+    
     executeStatusChange(empId, status);
   };
 
