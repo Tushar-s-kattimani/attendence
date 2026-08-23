@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { Home, Users, CalendarCheck, IndianRupee, Loader2 } from 'lucide-react';
+import { Home, Users, CalendarCheck, IndianRupee, Loader2, Banknote, Settings as SettingsIcon } from 'lucide-react';
 import { useAppContext } from './context/AppContext';
 import Dashboard from './pages/Dashboard';
 import Attendance from './pages/Attendance';
 import Employees from './pages/Employees';
 import SalaryReport from './pages/SalaryReport';
+import Advances from './pages/Advances';
+import Settings from './pages/Settings';
 import Login from './pages/Login';
 import './index.css';
 
@@ -27,6 +29,14 @@ const BottomNav = () => {
       <NavLink to="/salary" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
         <IndianRupee />
         <span>Salary</span>
+      </NavLink>
+      <NavLink to="/advances" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <Banknote />
+        <span>Advances</span>
+      </NavLink>
+      <NavLink to="/settings" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+        <SettingsIcon />
+        <span>Settings</span>
       </NavLink>
     </nav>
   );
@@ -69,6 +79,8 @@ const App = () => {
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/employees" element={<Employees />} />
             <Route path="/salary" element={<SalaryReport />} />
+            <Route path="/advances" element={<Advances />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </div>
 

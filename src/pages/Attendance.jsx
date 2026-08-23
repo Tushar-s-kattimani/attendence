@@ -23,14 +23,19 @@ const CustomCalendar = ({ selectedDate, onSelectDate, onClose, activeEmployees, 
       days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
     }
 
+    const today = new Date();
+    const todayStr = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       
       const recordsForDay = attendanceRecords[dateStr] || {};
       const markedCount = activeEmployees.filter(emp => recordsForDay[emp.id] !== undefined).length;
       
+      const isFuture = dateStr > todayStr;
+      
       let statusClass = '';
-      if (activeEmployees.length > 0) {
+      if (!isFuture && activeEmployees.length > 0) {
         if (markedCount === activeEmployees.length) statusClass = 'status-green';
         else if (markedCount > 0) statusClass = 'status-yellow';
         else statusClass = 'status-red';
@@ -42,7 +47,12 @@ const CustomCalendar = ({ selectedDate, onSelectDate, onClose, activeEmployees, 
         <div 
           key={d} 
           className={`calendar-day ${statusClass} ${isSelected ? 'selected' : ''}`}
+          style={{ opacity: isFuture ? 0.3 : 1, cursor: isFuture ? 'not-allowed' : 'pointer' }}
           onClick={() => {
+            if (isFuture) {
+              alert("You cannot mark attendance for future dates.");
+              return;
+            }
             onSelectDate(dateStr);
             onClose();
           }}

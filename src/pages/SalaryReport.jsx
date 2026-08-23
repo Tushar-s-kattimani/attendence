@@ -43,7 +43,7 @@ const SalaryReport = () => {
     });
   }, [activeEmployees, calculateSalary, selectedMonth, selectedYear]);
 
-  const totalPayout = reportData.reduce((sum, emp) => sum + emp.calculatedSalary, 0);
+  const totalPayout = reportData.reduce((sum, emp) => sum + emp.netPayable, 0);
 
   const downloadPDF = () => {
     const doc = new jsPDF();
@@ -70,10 +70,11 @@ const SalaryReport = () => {
     doc.text(`Salary Period: ${startDateStr} to ${endDateStr}`, pageWidth / 2, 30, { align: 'center' });
     
     // Prepare table data
-    const tableColumn = ["Sl.No", "Employee Name", "Working Days", "Present", "Absent", "Half Day", "Total Salary (Rs)"];
+    const tableColumn = ["Sl.No", "Employee Name", "Working Days", "Present", "Absent", "Half Day", "Net Payable", "Balance Adv."];
     const tableRows = [];
     
     reportData.forEach((emp, index) => {
+      const remainingBalance = emp.advanceBalance - emp.advanceDeduction;
       const rowData = [
         (index + 1).toString(),
         emp.name,
@@ -81,13 +82,14 @@ const SalaryReport = () => {
         emp.present.toString(),
         emp.absent.toString(),
         emp.halfDay.toString(),
-        emp.calculatedSalary.toString()
+        emp.netPayable.toString(),
+        remainingBalance > 0 ? remainingBalance.toString() : "-"
       ];
       tableRows.push(rowData);
     });
     
     // Add total row at the end
-    tableRows.push(["", "", "", "", "", "Total Payout", totalPayout.toString()]);
+    tableRows.push(["", "", "", "", "", "", "Total Payout", totalPayout.toString()]);
     
     // Generate table
     autoTable(doc, {
@@ -169,8 +171,10 @@ const SalaryReport = () => {
               <tr>
                 <th>Employee</th>
                 <th className="text-center">Working Days</th>
-                <th className="text-center">P / A / H</th>
-                <th style={{ textAlign: 'right' }}>Calculated Salary</th>
+                <th className="text-center">Present</th>
+                <th className="text-center">Absent</th>
+                <th className="text-center">Half Day</th>
+                <th style={{ textAlign: 'right' }}>Salary Breakdown</th>
               </tr>
             </thead>
             <tbody>
@@ -183,21 +187,20 @@ const SalaryReport = () => {
                   <td className="text-center font-medium">
                     {emp.totalWorkingDays}
                   </td>
-                  <td className="text-center" style={{ fontSize: '0.75rem', color: 'black' }}>
-                    <strong><span>{emp.present}</span></strong> / <strong><span>{emp.absent}</span></strong> / <strong><span>{emp.halfDay}</span></strong>
-                    {emp.absentDates && emp.absentDates.length > 0 && (
-                      <div className="mt-1" style={{ fontSize: '0.65rem', lineHeight: '1.2' }}>
-                        <strong>Absent on:</strong> <strong>{emp.absentDates.join(', ')}</strong>
+                  <td className="text-center" style={{ color: 'var(--color-present)', fontWeight: '500' }}>{emp.present}</td>
+                  <td className="text-center" style={{ color: 'var(--color-danger)', fontWeight: '500' }}>{emp.absent}</td>
+                  <td className="text-center" style={{ color: 'var(--color-warning)', fontWeight: '500' }}>{emp.halfDay}</td>
+                  <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>
+                    <div className="flex-between" style={{ paddingLeft: '1rem', fontWeight: '700', color: 'var(--color-primary)' }}>
+                      <span>Net Payable:</span>
+                      <span style={{ fontSize: '1rem' }}>₹{emp.netPayable.toLocaleString('en-IN')}</span>
+                    </div>
+                    {(emp.advanceBalance - emp.advanceDeduction) > 0 && (
+                      <div className="flex-between" style={{ paddingLeft: '1rem', color: 'var(--color-danger)', marginTop: '0.25rem' }}>
+                        <span>Balance Adv.:</span>
+                        <span>₹{(emp.advanceBalance - emp.advanceDeduction).toLocaleString('en-IN')}</span>
                       </div>
                     )}
-                    {emp.halfDayDates && emp.halfDayDates.length > 0 && (
-                      <div className="mt-1" style={{ fontSize: '0.65rem', lineHeight: '1.2' }}>
-                        <strong>Half Day on:</strong> <strong>{emp.halfDayDates.join(', ')}</strong>
-                      </div>
-                    )}
-                  </td>
-                  <td style={{ textAlign: 'right', fontWeight: '700', color: 'black' }}>
-                    ₹{emp.calculatedSalary.toLocaleString('en-IN')}
                   </td>
                 </tr>
               ))}

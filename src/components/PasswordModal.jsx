@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Lock } from 'lucide-react';
 
-const PasswordModal = ({ onSuccess, onClose }) => {
+const PasswordModal = ({ onSuccess, onClose, expectedPin = '9898', actionText = "edit attendance" }) => {
   const [pin, setPin] = useState('');
   const [error, setError] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (pin === '9898') {
+    if (pin === expectedPin) {
       onSuccess();
     } else {
       setError(true);
@@ -25,7 +25,7 @@ const PasswordModal = ({ onSuccess, onClose }) => {
           </div>
           <div>
             <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Authentication Required</h3>
-            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Enter PIN to edit attendance</p>
+            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Enter PIN to {actionText}</p>
           </div>
         </div>
         
@@ -41,8 +41,8 @@ const PasswordModal = ({ onSuccess, onClose }) => {
               setPin(e.target.value);
               setError(false);
             }}
-            placeholder="••••"
-            maxLength={4}
+            placeholder={expectedPin.replace(/./g, '•')}
+            maxLength={expectedPin.length}
             autoFocus
           />
           {error && <p style={{ color: 'var(--color-absent)', textAlign: 'center', marginBottom: '1rem', fontSize: '0.875rem' }}>Incorrect PIN</p>}
