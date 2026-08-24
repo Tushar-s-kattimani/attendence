@@ -251,12 +251,21 @@ h2 { font-size: 1.25rem; }
   right: 0;
   background-color: var(--color-surface);
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start; /* Changed to allow scrolling */
   padding: 0.75rem 0.5rem;
   box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
   z-index: 50;
   max-width: 600px;
   margin: 0 auto;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.bottom-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-item {
@@ -269,6 +278,8 @@ h2 { font-size: 1.25rem; }
   gap: 0.25rem;
   transition: color 0.2s ease;
   padding: 0.25rem 0.5rem;
+  flex: 0 0 auto;
+  min-width: 65px;
 }
 
 .nav-item svg {
