@@ -623,11 +623,13 @@ tr:last-child td {
 /* Responsive Desktop Layout */
 @media (min-width: 768px) {
   .app-container {
-    max-width: 1200px;
+    max-width: 1200px; /* Used for non-sidebar pages like Login */
   }
   
   .app-container.with-sidebar {
     padding-left: 240px; /* Space for the sidebar */
+    max-width: 100%;
+    margin: 0;
   }
 
   body {
@@ -635,7 +637,14 @@ tr:last-child td {
   }
 
   .page-header {
-    border-bottom-left-radius: 0; /* Attach header to the sidebar seamlessly */
+    border-radius: 0; /* Attach header to the sidebar seamlessly */
+    padding: 2rem 3rem;
+  }
+
+  .page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 3rem;
   }
 
   .grid-2 {

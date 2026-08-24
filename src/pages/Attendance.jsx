@@ -33,10 +33,11 @@ const CustomCalendar = ({ selectedDate, onSelectDate, onClose, activeEmployees, 
       const markedCount = activeEmployees.filter(emp => recordsForDay[emp.id] !== undefined).length;
       
       const isFuture = dateStr > todayStr;
+      const dayOfWeek = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d).getDay();
       
       let statusClass = '';
       if (!isFuture && activeEmployees.length > 0) {
-        if (markedCount === activeEmployees.length) statusClass = 'status-green';
+        if (dayOfWeek === 0 || markedCount === activeEmployees.length) statusClass = 'status-green';
         else if (markedCount > 0) statusClass = 'status-yellow';
         else statusClass = 'status-red';
       }

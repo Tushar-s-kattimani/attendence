@@ -50,7 +50,7 @@ const Settings = () => {
                 This action will permanently delete all daily attendance records AND all employee advance histories. 
                 Use this to start a fresh tracking period (e.g., a new financial year).
                 <br /><br />
-                <strong>Note:</strong> Employee profiles (names, roles, daily salary) will remain intact.
+                <strong>Note:</strong> Employee profiles (names, roles, monthly salary) will remain intact.
               </p>
               <button className="btn" style={{ backgroundColor: 'var(--color-danger)', color: 'white' }} onClick={handleResetClick}>
                 Reset All Data

@@ -74,8 +74,8 @@ const Employees = () => {
               <input type="text" className="form-control" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Employee Name" />
             </div>
             <div className="form-group">
-              <label className="form-label">Daily Salary (₹) *</label>
-              <input type="number" className="form-control" required value={formData.salary} onChange={e => setFormData({...formData, salary: e.target.value})} placeholder="500" min="0" />
+              <label className="form-label">Monthly Salary (₹) *</label>
+              <input type="number" className="form-control" required value={formData.salary} onChange={e => setFormData({...formData, salary: e.target.value})} placeholder="15000" min="0" />
             </div>
             <div className="mt-4">
               <button type="submit" className="btn btn-primary">{editingId ? 'Update Employee' : 'Save Employee'}</button>
@@ -97,7 +97,7 @@ const Employees = () => {
                   </div>
                   <div className="emp-details">
                     <h3>{emp.name} {emp.status === 'Inactive' && <span style={{fontSize: '0.7rem', backgroundColor: '#e5e7eb', padding: '2px 6px', borderRadius: '10px', marginLeft: '4px'}}>Inactive</span>}</h3>
-                    <p>₹{emp.salary}/day</p>
+                    <p>₹{emp.salary}/mo</p>
                   </div>
                 </div>
                 <div className="flex gap-2">

@@ -76,7 +76,22 @@ export const AppProvider = ({ children }) => {
   };
 
   const getAttendanceForDate = (date) => {
-    return attendanceRecords[date] || {};
+    const records = attendanceRecords[date] || {};
+    
+    const dayOfWeek = new Date(date).getDay();
+    const todayStr = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    
+    if (dayOfWeek === 0 && date <= todayStr) {
+      const autoRecords = { ...records };
+      employees.forEach(emp => {
+        if (emp.status !== 'Inactive' && autoRecords[emp.id] === undefined) {
+          autoRecords[emp.id] = 'Present';
+        }
+      });
+      return autoRecords;
+    }
+    
+    return records;
   };
   const resetAppData = () => {
     set(ref(db, 'attendance'), null);
@@ -91,27 +106,39 @@ export const AppProvider = ({ children }) => {
     set(ref(db, `advances/${newId}`), advanceRecord);
   };
 
-  const getEarnedSalaryForMonth = (employeeId, month, year, dailySalary) => {
+  const getEarnedSalaryForMonth = (employeeId, month, year, monthlySalary) => {
     let present = 0;
     let halfDay = 0;
-    const prefix = `${year}-${String(month).padStart(2, '0')}`;
     
-    Object.keys(attendanceRecords).forEach(date => {
-      if (date.startsWith(prefix)) {
-        const status = attendanceRecords[date][employeeId];
-        if (status === 'Present') present++;
-        else if (status === 'Half Day') halfDay++;
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const todayStr = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const dayOfWeek = new Date(year, month - 1, d).getDay();
+      const status = attendanceRecords[dateStr]?.[employeeId];
+      
+      if (status === 'Present') {
+        present++;
+      } else if (status === 'Half Day') {
+        halfDay++;
+      } else if (status === undefined && dayOfWeek === 0 && dateStr <= todayStr) {
+        present++;
       }
-    });
+    }
     
-    return Math.round((present * dailySalary) + (halfDay * dailySalary * 0.5));
+    const currentDailySalary = monthlySalary / daysInMonth;
+    const calculated = (present * currentDailySalary) + (halfDay * currentDailySalary * 0.5);
+    return Math.round(calculated * 100) / 100;
   };
 
   const calculateSalary = (employeeId, month, year) => {
     const employee = employees.find(e => e.id === employeeId);
     if (!employee) return { present: 0, absent: 0, halfDay: 0, totalWorkingDays: 0, calculatedSalary: 0, advanceBalance: 0, advanceDeduction: 0, netPayable: 0 };
 
-    const dailySalary = Number(employee.salary);
+    const monthlySalary = Number(employee.salary);
+    const daysInTargetMonth = new Date(year, month, 0).getDate();
+    const currentDailySalary = monthlySalary / daysInTargetMonth;
 
     // 1. Current month stats
     let present = 0;
@@ -119,27 +146,32 @@ export const AppProvider = ({ children }) => {
     let halfDay = 0;
     const absentDates = [];
     const halfDayDates = [];
-    const currentPrefix = `${year}-${String(month).padStart(2, '0')}`;
     
-    Object.keys(attendanceRecords).forEach(date => {
-      if (date.startsWith(currentPrefix)) {
-        const status = attendanceRecords[date][employeeId];
-        if (status === 'Present') {
-          present++;
-        } else if (status === 'Absent') {
-          absent++;
-          absentDates.push(date.split('-')[2]);
-        } else if (status === 'Half Day') {
-          halfDay++;
-          halfDayDates.push(date.split('-')[2]);
-        }
+    const todayStr = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    
+    for (let d = 1; d <= daysInTargetMonth; d++) {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const dayOfWeek = new Date(year, month - 1, d).getDay();
+      const status = attendanceRecords[dateStr]?.[employeeId];
+      
+      if (status === 'Present') {
+        present++;
+      } else if (status === 'Absent') {
+        absent++;
+        absentDates.push(String(d).padStart(2, '0'));
+      } else if (status === 'Half Day') {
+        halfDay++;
+        halfDayDates.push(String(d).padStart(2, '0'));
+      } else if (status === undefined && dayOfWeek === 0 && dateStr <= todayStr) {
+        present++;
       }
-    });
+    }
 
     absentDates.sort((a, b) => parseInt(a) - parseInt(b));
     halfDayDates.sort((a, b) => parseInt(a) - parseInt(b));
 
-    const calculatedSalary = Math.round((present * dailySalary) + (halfDay * dailySalary * 0.5));
+    const rawCalculatedSalary = (present * currentDailySalary) + (halfDay * currentDailySalary * 0.5);
+    const calculatedSalary = Math.round(rawCalculatedSalary * 100) / 100;
     const totalWorkingDays = present + (halfDay * 0.5);
 
     // 2. Calculate sequential advance balance up to this month
@@ -171,14 +203,15 @@ export const AppProvider = ({ children }) => {
         
       runningAdvance += advancesInM;
       
-      const salaryInM = getEarnedSalaryForMonth(employeeId, mMonth, mYear, dailySalary);
+      const salaryInM = getEarnedSalaryForMonth(employeeId, mMonth, mYear, monthlySalary);
       const deductionInM = Math.min(runningAdvance, salaryInM);
       runningAdvance -= deductionInM;
     }
 
     // Advances IN the target month
+    const currentPrefix = `${year}-${String(month).padStart(2, '0')}`;
     const advancesInTargetMonth = employeeAdvances
-        .filter(a => a.date && a.date.startsWith(currentPrefix))
+        .filter(a => a.date && typeof a.date === 'string' && a.date.startsWith(currentPrefix))
         .reduce((sum, a) => sum + Number(a.amount), 0);
         
     runningAdvance += advancesInTargetMonth;
@@ -197,7 +230,8 @@ export const AppProvider = ({ children }) => {
       calculatedSalary,
       advanceBalance,
       advanceDeduction,
-      netPayable
+      netPayable,
+      currentDailySalary
     };
   };
 

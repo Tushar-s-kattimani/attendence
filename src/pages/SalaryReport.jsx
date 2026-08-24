@@ -70,7 +70,7 @@ const SalaryReport = () => {
     doc.text(`Salary Period: ${startDateStr} to ${endDateStr}`, pageWidth / 2, 30, { align: 'center' });
     
     // Prepare table data
-    const tableColumn = ["Sl.No", "Employee Name", "Working Days", "Present", "Absent", "Half Day", "Net Payable", "Balance Adv."];
+    const tableColumn = ["Sl.No", "Employee Name", "Working Days", "Present", "Absent", "Half Day", "Total Amount", "Balance Adv."];
     const tableRows = [];
     
     reportData.forEach((emp, index) => {
@@ -82,14 +82,14 @@ const SalaryReport = () => {
         emp.present.toString(),
         emp.absent.toString(),
         emp.halfDay.toString(),
-        emp.netPayable.toString(),
-        remainingBalance > 0 ? remainingBalance.toString() : "-"
+        `Rs. ${emp.netPayable.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`,
+        remainingBalance > 0 ? `Rs. ${remainingBalance.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}` : "-"
       ];
       tableRows.push(rowData);
     });
     
     // Add total row at the end
-    tableRows.push(["", "", "", "", "", "", "Total Payout", totalPayout.toString()]);
+    tableRows.push(["", "", "", "", "", "", "Total Payout", `Rs. ${totalPayout.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`]);
     
     // Generate table
     autoTable(doc, {
@@ -117,7 +117,7 @@ const SalaryReport = () => {
     <div>
       <div className="mb-4">
         <h2>Salary Report</h2>
-        <p className="text-muted" style={{ fontSize: '0.875rem' }}>Calculated based on Daily Salary</p>
+        <p className="text-muted" style={{ fontSize: '0.875rem' }}>Calculated based on Monthly Salary</p>
       </div>
 
       <div className="card grid-2 mb-4">
@@ -156,7 +156,7 @@ const SalaryReport = () => {
       <div className="card mb-4" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
         <h3 style={{ fontSize: '1rem', opacity: 0.9, marginBottom: '0.25rem' }}>Total Estimated Payout</h3>
         <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-          ₹{totalPayout.toLocaleString('en-IN')}
+          ₹{totalPayout.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
         </div>
       </div>
 
@@ -182,7 +182,7 @@ const SalaryReport = () => {
                 <tr key={emp.id}>
                   <td>
                     <div style={{ fontWeight: '500' }}>{emp.name}</div>
-                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>₹{emp.salary}/day</div>
+                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>₹{emp.salary}/mo (₹{emp.currentDailySalary?.toFixed(1)}/day)</div>
                   </td>
                   <td className="text-center font-medium">
                     {emp.totalWorkingDays}
@@ -193,12 +193,12 @@ const SalaryReport = () => {
                   <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>
                     <div className="flex-between" style={{ paddingLeft: '1rem', fontWeight: '700', color: 'var(--color-primary)' }}>
                       <span>Net Payable:</span>
-                      <span style={{ fontSize: '1rem' }}>₹{emp.netPayable.toLocaleString('en-IN')}</span>
+                      <span style={{ fontSize: '1rem' }}>₹{emp.netPayable.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                     </div>
                     {(emp.advanceBalance - emp.advanceDeduction) > 0 && (
                       <div className="flex-between" style={{ paddingLeft: '1rem', color: 'var(--color-danger)', marginTop: '0.25rem' }}>
                         <span>Balance Adv.:</span>
-                        <span>₹{(emp.advanceBalance - emp.advanceDeduction).toLocaleString('en-IN')}</span>
+                        <span>₹{(emp.advanceBalance - emp.advanceDeduction).toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                       </div>
                     )}
                   </td>
