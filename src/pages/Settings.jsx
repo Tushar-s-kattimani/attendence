@@ -42,10 +42,10 @@ const Settings = () => {
         </h3>
         
         <div style={{ border: '1px solid var(--color-danger)', borderRadius: '8px', padding: '1rem', backgroundColor: 'rgba(220, 53, 69, 0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
             <AlertTriangle color="var(--color-danger)" size={24} style={{ flexShrink: 0, marginTop: '0.25rem' }} />
-            <div>
-              <h4 style={{ color: 'var(--color-danger)', margin: '0 0 0.5rem 0' }}>Reset Application Data</h4>
+            <div style={{ flex: '1 1 200px' }}>
+              <h4 style={{ color: 'var(--color-danger)', margin: '0 0 0.5rem 0', wordBreak: 'break-word' }}>Reset Application Data</h4>
               <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>
                 This action will permanently delete all daily attendance records AND all employee advance histories. 
                 Use this to start a fresh tracking period (e.g., a new financial year).
