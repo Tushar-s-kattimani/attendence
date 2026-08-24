@@ -36,6 +36,13 @@ body {
   color: var(--color-text-main);
   -webkit-font-smoothing: antialiased;
   padding-bottom: 70px; /* Space for bottom nav */
+  overflow-x: hidden;
+  width: 100%;
+}
+
+html {
+  overflow-x: hidden;
+  width: 100%;
 }
 
 /* Typography */
@@ -50,10 +57,12 @@ h2 { font-size: 1.25rem; }
 /* Layout */
 .app-container {
   max-width: 600px;
+  width: 100%;
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
   background-color: var(--color-background);
+  overflow-x: hidden;
 }
 
 .page-header {
