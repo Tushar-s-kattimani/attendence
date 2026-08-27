@@ -11,6 +11,11 @@ const SalaryReport = () => {
   const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
 
+  const formatMoney = (amount) => {
+    if (amount === undefined || amount === null) return "0.00";
+    return (Math.trunc(amount * 100) / 100).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   const activeEmployees = employees.filter(e => e.status !== 'Inactive');
 
   const monthOptions = [
@@ -82,14 +87,14 @@ const SalaryReport = () => {
         emp.present.toString(),
         emp.absent.toString(),
         emp.halfDay.toString(),
-        `Rs. ${emp.netPayable.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`,
-        remainingBalance > 0 ? `Rs. ${remainingBalance.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}` : "-"
+        `Rs. ${formatMoney(emp.netPayable)}`,
+        remainingBalance > 0 ? `Rs. ${formatMoney(remainingBalance)}` : "-"
       ];
       tableRows.push(rowData);
     });
     
     // Add total row at the end
-    tableRows.push(["", "", "", "", "", "", "Total Payout", `Rs. ${totalPayout.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`]);
+    tableRows.push(["", "", "", "", "", "", "Total Payout", `Rs. ${formatMoney(totalPayout)}`]);
     
     // Generate table
     autoTable(doc, {
@@ -156,7 +161,7 @@ const SalaryReport = () => {
       <div className="card mb-4" style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}>
         <h3 style={{ fontSize: '1rem', opacity: 0.9, marginBottom: '0.25rem' }}>Total Estimated Payout</h3>
         <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>
-          ₹{totalPayout.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+          ₹{formatMoney(totalPayout)}
         </div>
       </div>
 
@@ -182,7 +187,7 @@ const SalaryReport = () => {
                 <tr key={emp.id}>
                   <td>
                     <div style={{ fontWeight: '500' }}>{emp.name}</div>
-                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>₹{emp.salary}/mo (₹{emp.currentDailySalary?.toFixed(1)}/day)</div>
+                    <div className="text-muted" style={{ fontSize: '0.75rem' }}>₹{emp.salary}/mo (₹{formatMoney(emp.currentDailySalary)}/day)</div>
                   </td>
                   <td className="text-center font-medium">
                     {emp.totalWorkingDays}
@@ -193,12 +198,12 @@ const SalaryReport = () => {
                   <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>
                     <div className="flex-between" style={{ paddingLeft: '1rem', fontWeight: '700', color: 'var(--color-primary)' }}>
                       <span>Net Payable:</span>
-                      <span style={{ fontSize: '1rem' }}>₹{emp.netPayable.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                      <span style={{ fontSize: '1rem' }}>₹{formatMoney(emp.netPayable)}</span>
                     </div>
                     {(emp.advanceBalance - emp.advanceDeduction) > 0 && (
                       <div className="flex-between" style={{ paddingLeft: '1rem', color: 'var(--color-danger)', marginTop: '0.25rem' }}>
                         <span>Balance Adv.:</span>
-                        <span>₹{(emp.advanceBalance - emp.advanceDeduction).toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                        <span>₹{formatMoney(emp.advanceBalance - emp.advanceDeduction)}</span>
                       </div>
                     )}
                   </td>
