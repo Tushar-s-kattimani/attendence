@@ -193,8 +193,22 @@ const SalaryReport = () => {
                     {emp.totalWorkingDays}
                   </td>
                   <td className="text-center" style={{ color: 'var(--color-present)', fontWeight: '500' }}>{emp.present}</td>
-                  <td className="text-center" style={{ color: 'var(--color-danger)', fontWeight: '500' }}>{emp.absent}</td>
-                  <td className="text-center" style={{ color: 'var(--color-warning)', fontWeight: '500' }}>{emp.halfDay}</td>
+                  <td className="text-center" style={{ color: 'var(--color-danger)', fontWeight: '500' }}>
+                    <div>{emp.absent}</div>
+                    {emp.absent > 0 && (
+                      <div style={{ fontSize: '0.75rem', marginTop: '0.125rem' }}>
+                        ({emp.absentDates.join(', ')})
+                      </div>
+                    )}
+                  </td>
+                  <td className="text-center" style={{ color: 'var(--color-warning)', fontWeight: '500' }}>
+                    <div>{emp.halfDay}</div>
+                    {emp.halfDay > 0 && (
+                      <div style={{ fontSize: '0.75rem', marginTop: '0.125rem' }}>
+                        ({emp.halfDayDates.join(', ')})
+                      </div>
+                    )}
+                  </td>
                   <td style={{ textAlign: 'right', fontSize: '0.85rem' }}>
                     <div className="flex-between" style={{ paddingLeft: '1rem', fontWeight: '700', color: 'var(--color-primary)' }}>
                       <span>Net Payable:</span>
