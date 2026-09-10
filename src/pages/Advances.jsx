@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Plus, Banknote } from 'lucide-react';
+import { Plus, Banknote, Trash2 } from 'lucide-react';
 
 const Advances = () => {
-  const { employees, advances, giveAdvance, getRealtimeAdvanceBalance } = useAppContext();
+  const { employees, advances, giveAdvance, getRealtimeAdvanceBalance, deleteAdvance } = useAppContext();
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [amount, setAmount] = useState('');
   
@@ -129,6 +129,7 @@ const Advances = () => {
                     <th>Date</th>
                     <th>Employee</th>
                     <th style={{ textAlign: 'right' }}>Amount</th>
+                    <th style={{ width: '40px' }}></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -136,9 +137,28 @@ const Advances = () => {
                     const emp = employees.find(e => e.id === adv.employeeId);
                     return (
                       <tr key={adv.id || idx}>
-                        <td>{adv.date}</td>
+                        <td>{adv.date ? adv.date.split('-').reverse().join('/') : ''}</td>
                         <td>{emp ? emp.name : 'Unknown'}</td>
                         <td style={{ textAlign: 'right', fontWeight: '500' }}>₹{Number(adv.amount).toLocaleString('en-IN')}</td>
+                        <td style={{ textAlign: 'right' }}>
+                          {adv.id && (
+                            <button 
+                              className="btn btn-outline" 
+                              style={{ padding: '0.25rem 0.5rem', borderColor: '#fee2e2', color: '#ef4444', border: 'none' }}
+                              onClick={() => {
+                                const password = window.prompt('Enter password to delete:');
+                                if (password === '9898') {
+                                  deleteAdvance(adv.id);
+                                } else if (password !== null) {
+                                  alert('Incorrect password!');
+                                }
+                              }}
+                              title="Delete Transaction"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}

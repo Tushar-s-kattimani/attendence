@@ -106,6 +106,12 @@ export const AppProvider = ({ children }) => {
     set(ref(db, `advances/${newId}`), advanceRecord);
   };
 
+  const deleteAdvance = (advanceId) => {
+    if (advanceId) {
+      set(ref(db, `advances/${advanceId}`), null);
+    }
+  };
+
   const getEarnedSalaryForMonth = (employeeId, month, year, monthlySalary) => {
     let present = 0;
     let halfDay = 0;
@@ -252,6 +258,7 @@ export const AppProvider = ({ children }) => {
     getAttendanceForDate,
     resetAppData,
     giveAdvance,
+    deleteAdvance,
     calculateSalary,
     getRealtimeAdvanceBalance,
     loading
