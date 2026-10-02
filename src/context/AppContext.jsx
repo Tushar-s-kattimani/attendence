@@ -237,7 +237,8 @@ export const AppProvider = ({ children }) => {
       advanceBalance,
       advanceDeduction,
       netPayable,
-      currentDailySalary
+      currentDailySalary,
+      advancesInTargetMonth
     };
   };
 

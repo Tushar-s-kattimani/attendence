@@ -9,6 +9,21 @@ const Advances = () => {
   
   const [activeTab, setActiveTab] = useState(null);
   
+  const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
+
+  const monthOptions = [
+    { value: 1, label: 'January' }, { value: 2, label: 'February' }, { value: 3, label: 'March' },
+    { value: 4, label: 'April' }, { value: 5, label: 'May' }, { value: 6, label: 'June' },
+    { value: 7, label: 'July' }, { value: 8, label: 'August' }, { value: 9, label: 'September' },
+    { value: 10, label: 'October' }, { value: 11, label: 'November' }, { value: 12, label: 'December' }
+  ];
+
+  const yearOptions = [];
+  for (let i = new Date().getFullYear() - 2; i <= new Date().getFullYear() + 1; i++) {
+    yearOptions.push(i);
+  }
+  
   const activeEmployees = employees.filter(e => e.status !== 'Inactive');
   
   const handleGiveAdvance = (e) => {
@@ -22,7 +37,13 @@ const Advances = () => {
     setAmount('');
   };
 
-  const sortedAdvances = [...advances].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const filteredAdvances = advances.filter(adv => {
+    if (!adv.date) return false;
+    const [y, m] = adv.date.split('-');
+    return parseInt(y, 10) === filterYear && parseInt(m, 10) === filterMonth;
+  });
+
+  const sortedAdvances = [...filteredAdvances].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
     <div>
@@ -117,6 +138,32 @@ const Advances = () => {
 
       {activeTab === 'history' && (
         <div className="mb-4 fade-in-up">
+          <div className="card grid-2 mb-4">
+            <div className="form-group mb-0">
+              <label className="form-label">Month</label>
+              <select 
+                className="form-control" 
+                value={filterMonth} 
+                onChange={(e) => setFilterMonth(Number(e.target.value))}
+              >
+                {monthOptions.map(m => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group mb-0">
+              <label className="form-label">Year</label>
+              <select 
+                className="form-control" 
+                value={filterYear} 
+                onChange={(e) => setFilterYear(Number(e.target.value))}
+              >
+                {yearOptions.map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+          </div>
           {sortedAdvances.length === 0 ? (
             <div className="card text-center">
               <p className="text-muted">No advances given yet.</p>

@@ -51,7 +51,7 @@ const SalaryReport = () => {
   const totalPayout = reportData.reduce((sum, emp) => sum + emp.netPayable, 0);
 
   const downloadPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({ orientation: 'landscape' });
     
     // Set font to a classic Serif style (closest standard built-in to Bookman)
     doc.setFont("times", "roman");
@@ -75,10 +75,11 @@ const SalaryReport = () => {
     doc.text(`Salary Period: ${startDateStr} to ${endDateStr}`, pageWidth / 2, 30, { align: 'center' });
     
     // Prepare table data
-    const tableColumn = ["Sl.No", "Employee Name", "Working Days", "Present", "Absent", "Half Day", "Total Amount", "Balance Adv."];
+    const tableColumn = ["Sl.No", "Employee Name", "Working Days", "Present", "Absent", "Monthly Salary", "Absent Cut", "Advance Taken", "Total Payment", "Balance Adv."];
     const tableRows = [];
     
     reportData.forEach((emp, index) => {
+      const absentCut = (emp.absent * emp.currentDailySalary) + (emp.halfDay * emp.currentDailySalary * 0.5);
       const remainingBalance = emp.advanceBalance - emp.advanceDeduction;
       const rowData = [
         (index + 1).toString(),
@@ -86,7 +87,9 @@ const SalaryReport = () => {
         emp.totalWorkingDays.toString(),
         emp.present.toString(),
         emp.absent.toString(),
-        emp.halfDay.toString(),
+        `Rs. ${formatMoney(emp.salary)}`,
+        `Rs. ${formatMoney(absentCut)}`,
+        `Rs. ${formatMoney(emp.advancesInTargetMonth || 0)}`,
         `Rs. ${formatMoney(emp.netPayable)}`,
         remainingBalance > 0 ? `Rs. ${formatMoney(remainingBalance)}` : "-"
       ];
@@ -94,7 +97,7 @@ const SalaryReport = () => {
     });
     
     // Add total row at the end
-    tableRows.push(["", "", "", "", "", "", "Total Payout", `Rs. ${formatMoney(totalPayout)}`]);
+    tableRows.push(["", "", "", "", "", "", "", "Total Payout", `Rs. ${formatMoney(totalPayout)}`, ""]);
     
     // Generate table
     autoTable(doc, {
